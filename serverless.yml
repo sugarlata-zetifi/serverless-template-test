@@ -1,0 +1,80 @@
+# Welcome to Serverless!
+#
+# This is a base service config for Zetifi
+# See README.md for more information
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+
+service: template-service # Use the same name as the repository without "zetifi-serverless-"
+frameworkVersion: "3"
+useDotenv: true
+
+plugins:
+  - serverless-iam-roles-per-function
+  - serverless-python-requirements
+  - serverless-plugin-aws-alerts
+  - serverless-plugin-git-variables
+
+package:
+  patterns:
+    - "!node_modules/**"
+    - "!tests/**"
+    - "!.vscode/**"
+    - "!.pytest_cache/**"
+
+custom:
+  exportGitVariables: false
+  pythonRequirements:
+    slim: true
+    dockerizePip: true # Best practice for compatibility.
+    # Set explicitly when required for private pip installs.
+    #dockerEnv:
+    #  - GITHUB_TOKEN=${env:GITHUB_TOKEN}
+
+  # Default custom alert for all Zetifi serverless functions. Alarm will trigger when "Traceback" appears in logs.
+  # Additional alerts can be configured as necessary https://www.serverless.com/plugins/serverless-plugin-aws-alerts
+  alerts:
+    topics:
+      alarm:
+        topic: arn:aws:sns:${aws:region}:${aws:accountId}:cloudwatch-to-slack-${sls:stage}
+    definitions:
+      traceback:
+        nameTemplate: $[functionName]-$[metricName]-${sls:stage}
+        namespace: $[functionName]
+        metric: traceback
+        description: "Traceback occurred in function, see CloudWatch logs for info."
+        threshold: 0
+        statistic: Sum
+        period: 300
+        evaluationPeriods: 1
+        comparisonOperator: GreaterThanThreshold
+        pattern: "Traceback"
+        treatMissingData: notBreaching
+
+provider:
+  name: aws
+  runtime: python3.8
+  versionFunctions: false
+  stage: ${opt:stage, "dev"}
+  region: ap-southeast-2
+  logRetentionInDays: 365
+  memorySize: 256
+  deploymentBucket:
+    name: serverless-${aws:accountId}-${aws:region}
+  stackTags:
+    GIT_REPOSITORY: ${git:repository}
+    GIT_BRANCH: ${git:branch}
+    GIT_COMMIT_SHORT: ${git:sha1}
+    GIT_TAGS: ${git:tags}
+
+functions:
+  hello:
+    handler: app.main.handler
+    description: Im a template service
+    events:
+      - http:
+          path: /
+          method: get
+    alarms:
+      - traceback

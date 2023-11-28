@@ -1,0 +1,18 @@
+name: Serverless deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  pytest:
+    uses: zetifi/.github-private/.github/workflows/pytest.yml@master
+    secrets: inherit
+
+  deploy:
+    needs: pytest
+    uses: zetifi/.github-private/.github/workflows/serverless-deploy.yml@master
+    with:
+      environment: 'live'
+    secrets: inherit

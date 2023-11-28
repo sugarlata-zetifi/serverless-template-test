@@ -1,0 +1,12 @@
+name: Test Python
+
+on:
+  push:
+    branches-ignore:
+      - master
+  workflow_dispatch:
+
+jobs:
+  pytest:
+    uses: zetifi/.github-private/.github/workflows/pytest.yml@master
+    secrets: inherit

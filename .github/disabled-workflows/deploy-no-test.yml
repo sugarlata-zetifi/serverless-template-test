@@ -1,0 +1,13 @@
+name: Serverless deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    uses: zetifi/.github-private/.github/workflows/serverless-deploy.yml@master
+    with:
+      environment: 'live'
+    secrets: inherit

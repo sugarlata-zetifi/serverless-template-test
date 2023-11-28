@@ -1,0 +1,25 @@
+name: Serverless deploy
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: choice
+        options:
+          - dev
+
+jobs:
+  pytest:
+    uses: zetifi/.github-private/.github/workflows/pytest.yml@master
+    secrets: inherit
+
+  deploy:
+    needs: pytest
+    uses: zetifi/.github-private/.github/workflows/serverless-deploy.yml@master
+    with:
+      environment: ${{ github.ref == 'refs/heads/master' && 'live' || github.event.inputs.environment }}
+    secrets: inherit
