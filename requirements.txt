@@ -1,0 +1,16 @@
+-i https://pypi.org/simple
+authlib==1.2.1
+certifi==2023.11.17; python_version >= '3.6'
+cffi==1.16.0; python_version >= '3.8'
+charset-normalizer==3.3.2; python_full_version >= '3.7.0'
+cryptography==41.0.7; python_version >= '3.7'
+geojson==3.1.0; python_version >= '3.7'
+idna==3.6; python_version >= '3.5'
+pycparser==2.21
+python-dateutil==2.8.2; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+requests==2.31.0; python_version >= '3.7'
+simple-salesforce==1.11.1
+simpler-salesforce@ git+https://x-access-token:${GITHUB_TOKEN}@github.com/Zetifi/simpler_salesforce.git@1af328f65937891c77a940c3443843a4e8ca7fb3
+six==1.16.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+soql@ git+https://github.com/plangrid/soql@c5f4a7d3ee49c55309b96c5b314411981283341c
+urllib3==2.1.0; python_version >= '3.8'

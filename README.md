@@ -1,3 +1,11 @@
+# README FIRST
+
+This was Nathan's testing for serverless template and migrating from serverless to Terraform. There are some possible workflows and scripts that might be helpful in this repo (esp. tf-sls-replacement/). At this time, it has been determined that SLS completing this task is best, so these scripts / workflow are not being used.
+
+
+
+
+
 # zetifi-serverless-template
 Boilerplate template repository for Serverless framework.
 

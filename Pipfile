@@ -4,6 +4,8 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [packages]
+geojson = "*"
+simpler_salesforce = {ref = "master", editable = false, git = "https://x-access-token:$GITHUB_TOKEN@github.com/Zetifi/simpler_salesforce.git"}
 
 [dev-packages]
 pytest = "*"

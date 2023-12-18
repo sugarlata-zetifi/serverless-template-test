@@ -6,7 +6,7 @@
 # For full config options, check the docs:
 #    docs.serverless.com
 
-service: template-service # Use the same name as the repository without "zetifi-serverless-"
+service: lambda-function-latest # Use the same name as the repository without "zetifi-serverless-"
 frameworkVersion: "3"
 useDotenv: true
 
@@ -22,39 +22,23 @@ package:
     - "!tests/**"
     - "!.vscode/**"
     - "!.pytest_cache/**"
+    - "!tf*/**"
+    - "!.github/**"
 
 custom:
   exportGitVariables: false
   pythonRequirements:
+    useStaticCache: false
     slim: true
+    # pipCmdExtraArgs: ['--platform manylinux2014_x86_64', '--only-binary=:all:']
     dockerizePip: true # Best practice for compatibility.
     # Set explicitly when required for private pip installs.
-    #dockerEnv:
-    #  - GITHUB_TOKEN=${env:GITHUB_TOKEN}
-
-  # Default custom alert for all Zetifi serverless functions. Alarm will trigger when "Traceback" appears in logs.
-  # Additional alerts can be configured as necessary https://www.serverless.com/plugins/serverless-plugin-aws-alerts
-  alerts:
-    topics:
-      alarm:
-        topic: arn:aws:sns:${aws:region}:${aws:accountId}:cloudwatch-to-slack-${sls:stage}
-    definitions:
-      traceback:
-        nameTemplate: $[functionName]-$[metricName]-${sls:stage}
-        namespace: $[functionName]
-        metric: traceback
-        description: "Traceback occurred in function, see CloudWatch logs for info."
-        threshold: 0
-        statistic: Sum
-        period: 300
-        evaluationPeriods: 1
-        comparisonOperator: GreaterThanThreshold
-        pattern: "Traceback"
-        treatMissingData: notBreaching
+    dockerEnv:
+     - GITHUB_TOKEN=${env:GITHUB_TOKEN}
 
 provider:
   name: aws
-  runtime: python3.8
+  runtime: python3.11
   versionFunctions: false
   stage: ${opt:stage, "dev"}
   region: ap-southeast-2
@@ -68,13 +52,27 @@ provider:
     GIT_COMMIT_SHORT: ${git:sha1}
     GIT_TAGS: ${git:tags}
 
+
 functions:
   hello:
     handler: app.main.handler
-    description: Im a template service
+    description: A simple hello world function
     events:
       - http:
           path: /
           method: get
-    alarms:
-      - traceback
+          cors: true
+
+resources:
+  Resources:
+    Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:service}-${self:provider.stage}
+        AccessControl: Private
+        Tags:
+          - Key: Name
+            Value: ${self:service}-${self:provider.stage}
+
+
+
